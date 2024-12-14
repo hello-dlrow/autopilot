@@ -4,6 +4,18 @@ import matplotlib.pyplot as plt
 from kalman import KalmanFilter
 import book_plots as book_plots
 
+kf = KalmanFilter()
+kf.x = np.array([[-0.8],
+                [250]])
+kf.A = np.eye(2)
+kf.H = np.array([[0.5, 0],
+                 [0, 30]])
+kf.Q = np.array([[0.05, 0],
+                 [0, 5]])
+kf.R = np.array([[0.02, 0],
+                 [0, 5]])
+kf.P = np.eye(2) * 1
+
 def changecolor(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -131,9 +143,9 @@ def average_slope_intercept(image, lines):
         left_fit_average = np.average(filtered_left_fit, axis=0)
         right_fit_average = np.average(filtered_right_fit, axis=0)
 
-
-        print(type(left_fit_average))
+        # 卡尔曼滤波
         
+        left_fit_average = kf.process_measurement(left_fit_average)
         
         # 生成最终坐标
         left_line = make_coordinates(image, left_fit_average)
@@ -199,7 +211,9 @@ def filter_outliers(fit_points):
 
 image = cv2.imread('/Users/wumingyao/Documents/lab7/autopilot/data/videotest.jpg')
 lane_image = np.copy(image)
-kf = KalmanFilter()
+
+
+
 ##changecolor = changecolor(lane_image)
 
 cap = cv2.VideoCapture('/Users/wumingyao/Documents/lab7/autopilot/data/videotest.mp4')
